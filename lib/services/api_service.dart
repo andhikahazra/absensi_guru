@@ -9,7 +9,7 @@ class ApiService {
 
   static final ApiService instance = ApiService._();
 
-  String baseUrl = 'http://192.168.101.21:8000';
+  String baseUrl = 'http://172.20.10.3:8000';
   String? _token;
   Map<String, dynamic>? currentUser;
 
@@ -36,23 +36,21 @@ class ApiService {
   Uri _uri(String path) => Uri.parse('$baseUrl$path');
 
   Map<String, String> _headers({bool withAuth = false}) {
-    final headers = {
-      HttpHeaders.acceptHeader: 'application/json',
-    };
+    final headers = {HttpHeaders.acceptHeader: 'application/json'};
     if (withAuth && _token != null) {
       headers[HttpHeaders.authorizationHeader] = 'Bearer $_token';
     }
     return headers;
   }
 
-  Future<Map<String, dynamic>> login({required String email, required String password}) async {
+  Future<Map<String, dynamic>> login({
+    required String email,
+    required String password,
+  }) async {
     final response = await http.post(
       _uri('/api/login'),
       headers: _headers(),
-      body: {
-        'email': email,
-        'password': password,
-      },
+      body: {'email': email, 'password': password},
     );
 
     if (response.statusCode == 200) {
@@ -61,21 +59,23 @@ class ApiService {
       if (token is String) {
         await _saveToken(token);
       }
-      currentUser = data['user'] is Map<String, dynamic> ? data['user'] as Map<String, dynamic> : null;
+      currentUser = data['user'] is Map<String, dynamic>
+          ? data['user'] as Map<String, dynamic>
+          : null;
       return data;
     }
     throw HttpException('Login gagal (${response.statusCode})');
   }
 
-  Future<Map<String, dynamic>> register({required String name, required String email, required String password}) async {
+  Future<Map<String, dynamic>> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
     final response = await http.post(
       _uri('/api/register'),
       headers: _headers(),
-      body: {
-        'name': name,
-        'email': email,
-        'password': password,
-      },
+      body: {'name': name, 'email': email, 'password': password},
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -110,19 +110,14 @@ class ApiService {
       json = jsonDecode(bodyString) as Map<String, dynamic>;
     } catch (_) {}
 
-    if (response.statusCode == 200 && json != null) {
+    // Return response jika ada valid JSON (baik 200 OK maupun error response)
+    if (json != null) {
       return json;
     }
 
-    final rawMessage = (json != null && json['message'] is String && (json['message'] as String).isNotEmpty)
-        ? json['message'] as String
-        : null;
-
-    final lower = rawMessage?.toLowerCase() ?? '';
+    // Jika tidak ada valid JSON response
     final friendly = 'Layanan verifikasi wajah bermasalah. Coba lagi.';
-    final message = (rawMessage != null && !lower.contains('invalid response')) ? rawMessage : friendly;
-
-    throw HttpException(message);
+    throw HttpException(friendly);
   }
 
   Future<void> logout() async {
@@ -152,5 +147,28 @@ class ApiService {
       if (data is List) return data.cast<Map<String, dynamic>>();
     }
     throw HttpException('Format data absensi tidak dikenali');
+  }
+
+  Future<Map<String, dynamic>?> fetchTodayAttendance() async {
+    try {
+      final response = await http.get(
+        _uri('/api/attendances/today'),
+        headers: _headers(withAuth: true),
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded['data'] as Map<String, dynamic>?;
+        }
+        if (decoded is Map<String, dynamic> &&
+            decoded.containsKey('check_in')) {
+          return decoded;
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
   }
 }

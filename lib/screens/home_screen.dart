@@ -38,172 +38,252 @@ class _HomeScreenState extends State<HomeScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: 260,
-                  decoration: BoxDecoration(gradient: headerGradient),
-                ),
-                Positioned(
-                  right: -40,
-                  top: -60,
-                  child: Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      shape: BoxShape.circle,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 260,
+                    decoration: BoxDecoration(gradient: headerGradient),
+                  ),
+                  Positioned(
+                    right: -40,
+                    top: -60,
+                    child: Container(
+                      width: 220,
+                      height: 220,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 48, 20, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Morning,', style: theme.textTheme.titleMedium?.copyWith(color: Colors.white70)),
-                              const SizedBox(height: 4),
-                              Text(
-                                (ApiService.instance.currentUser?['name'] as String?) ?? 'User',
-                                style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 2),
-                              Text('Business Process Development', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70)),
-                            ],
-                          ),
-                          CircleAvatar(
-                            radius: 28,
-                            backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=47'),
-                            backgroundColor: Colors.white.withOpacity(0.4),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        shape: defaultCardShape,
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Working Schedule', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                                  Text('Today', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade600)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text('09:00 - 18:00', style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold)),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: accentPurple.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.watch_later_outlined, size: 18, color: accentPurple),
-                                        const SizedBox(width: 6),
-                                        Text('Office', style: theme.textTheme.bodyMedium?.copyWith(color: accentPurple, fontWeight: FontWeight.w700)),
-                                      ],
-                                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 48, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Morning,',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: Colors.white70,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/checkin');
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: accentPurple,
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                  ),
-                                  child: const Text('Check In'),
                                 ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  (ApiService.instance.currentUser?['name']
+                                          as String?) ??
+                                      'User',
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Business Process Development',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundImage: const NetworkImage(
+                                'https://i.pravatar.cc/150?img=47',
                               ),
-                            ],
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Card(
+                          shape: defaultCardShape,
+                          margin: EdgeInsets.zero,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Working Schedule',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                    Text(
+                                      'Today',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: Colors.grey.shade600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '07:00 - 16.00',
+                                      style: theme.textTheme.displaySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: accentPurple.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.watch_later_outlined,
+                                            size: 18,
+                                            color: accentPurple,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Office',
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  color: accentPurple,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 18),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/checkin');
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentPurple,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                    child: const Text('Check In'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Card(
-                    shape: defaultCardShape,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          _QuickAction(label: 'Attendance\nList', icon: Icons.list_alt_rounded),
-                          _QuickAction(label: 'Attendance\nCorrection', icon: Icons.edit_calendar_rounded),
-                          _QuickAction(label: 'On Duty', icon: Icons.flight_takeoff_rounded),
-                          _QuickAction(label: 'Leave', icon: Icons.beach_access_rounded),
-                        ],
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Attendance', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 12),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _attFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const _AttendanceSkeleton();
-                      }
-                      if (snapshot.hasError) {
-                        return Text('Gagal memuat data absensi');
-                      }
-                      final data = snapshot.data ?? [];
-                      if (data.isEmpty) {
-                        return Text('Belum ada data', style: theme.textTheme.bodyMedium);
-                      }
-                      return Column(
-                        children: data.take(2).map((e) {
-                          final mapped = _mapAttendance(e);
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _AttendanceCard(
-                              dateLabel: mapped.dateLabel,
-                              startTime: mapped.checkIn,
-                              endTime: mapped.checkOut,
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
                   ),
                 ],
               ),
             ),
-          ),
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Card(
+                      shape: defaultCardShape,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 12,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            _QuickAction(
+                              label: 'Attendance\nList',
+                              icon: Icons.list_alt_rounded,
+                            ),
+                            _QuickAction(
+                              label: 'Attendance\nCorrection',
+                              icon: Icons.edit_calendar_rounded,
+                            ),
+                            _QuickAction(
+                              label: 'On Duty',
+                              icon: Icons.flight_takeoff_rounded,
+                            ),
+                            _QuickAction(
+                              label: 'Leave',
+                              icon: Icons.beach_access_rounded,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Attendance',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _attFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const _AttendanceSkeleton();
+                        }
+                        if (snapshot.hasError) {
+                          return Text('Gagal memuat data absensi');
+                        }
+                        final data = snapshot.data ?? [];
+                        if (data.isEmpty) {
+                          return Text(
+                            'Belum ada data',
+                            style: theme.textTheme.bodyMedium,
+                          );
+                        }
+                        return Column(
+                          children: data.take(2).map((e) {
+                            final mapped = _mapAttendance(e);
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: _AttendanceCard(
+                                dateLabel: mapped.dateLabel,
+                                startTime: mapped.checkIn,
+                                endTime: mapped.checkOut,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
@@ -237,8 +317,19 @@ class _AttendanceCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(dateLabel, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                Text('View', style: theme.textTheme.bodyMedium?.copyWith(color: accentPurple, fontWeight: FontWeight.w600)),
+                Text(
+                  dateLabel,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  'View',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: accentPurple,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -262,11 +353,7 @@ class _AttendanceSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        _SkeletonBox(),
-        SizedBox(height: 10),
-        _SkeletonBox(),
-      ],
+      children: const [_SkeletonBox(), SizedBox(height: 10), _SkeletonBox()],
     );
   }
 }
@@ -277,7 +364,10 @@ class _SkeletonBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,7 +412,20 @@ _AttendanceViewData _mapAttendance(Map<String, dynamic> raw) {
   String formatDate(DateTime? dt) {
     if (dt == null) return 'Unknown';
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final dayLabel = days[(dt.weekday - 1).clamp(0, 6)];
     final monthLabel = months[(dt.month - 1).clamp(0, 11)];
     return '$dayLabel, ${dt.day.toString().padLeft(2, '0')} $monthLabel ${dt.year}';
@@ -333,9 +436,15 @@ _AttendanceViewData _mapAttendance(Map<String, dynamic> raw) {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
-  final dateValue = raw['date'] as String? ?? raw['check_in'] as String? ?? raw['checkin_at'] as String? ?? raw['created_at'] as String?;
-  final checkInValue = raw['check_in'] as String? ?? raw['checkin_at'] as String?;
-  final checkOutValue = raw['check_out'] as String? ?? raw['checkout_at'] as String?;
+  final dateValue =
+      raw['date'] as String? ??
+      raw['check_in'] as String? ??
+      raw['checkin_at'] as String? ??
+      raw['created_at'] as String?;
+  final checkInValue =
+      raw['check_in'] as String? ?? raw['checkin_at'] as String?;
+  final checkOutValue =
+      raw['check_out'] as String? ?? raw['checkout_at'] as String?;
 
   final date = parseDate(dateValue) ?? parseDate(checkInValue);
   final checkIn = parseDate(checkInValue);
@@ -363,8 +472,18 @@ class _PinTime extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade600)),
-            Text(time, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+            ),
+            Text(
+              time,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       ],
@@ -395,7 +514,9 @@ class _QuickAction extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

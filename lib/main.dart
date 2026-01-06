@@ -19,7 +19,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(seedColor: primaryColor, background: softBackground);
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: primaryColor,
+      background: softBackground,
+    );
     return MaterialApp(
       title: 'HC Management',
       debugShowCheckedModeBanner: false,
@@ -35,7 +38,10 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -54,7 +60,9 @@ class MyApp extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14),
             backgroundColor: primaryColor,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             textStyle: const TextStyle(fontWeight: FontWeight.w700),
           ),
         ),
