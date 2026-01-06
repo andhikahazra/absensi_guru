@@ -171,4 +171,24 @@ class ApiService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>?> fetchCurrentUser() async {
+    try {
+      final response = await http.get(
+        _uri('/api/user'),
+        headers: _headers(withAuth: true),
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          currentUser = decoded;
+          return decoded;
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }

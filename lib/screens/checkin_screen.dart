@@ -19,6 +19,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
   late Future<void> _initFuture;
   bool _submitting = false;
   bool _isCheckOut = false;
+  bool _attendanceCompleted = false; // Tambah ini
 
   @override
   void initState() {
@@ -54,38 +55,63 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
       if (!mounted) return;
 
-      if (todayAttendance != null) {
-        final status = AttendanceStatusData.fromJson(todayAttendance);
+      print('[DEBUG] fetchTodayAttendance response: $todayAttendance');
 
-        if (status.isCompleted &&
-            status.checkInTime != null &&
-            status.checkOutTime != null) {
-          NotificationDialogs.showAttendanceCompleted(
-            context,
-            checkInTime: status.checkInTime!,
-            checkOutTime: status.checkOutTime!,
-            onConfirm: () {},
-          );
-          setState(() => _isCheckOut = false);
-          return;
-        } else if (status.checkedIn &&
-            !status.checkedOut &&
-            status.checkInTime != null) {
-          NotificationDialogs.showInfo(
-            context,
-            title: 'Check-in Sudah Dicatat',
-            message:
-                'Anda sudah check-in pada ${_formatTime(status.checkInTime!)}.\n\nSilakan ambil foto untuk check-out.',
-            onConfirm: () {},
-          );
-          setState(() => _isCheckOut = true);
-          return;
+      if (todayAttendance != null) {
+        try {
+          final status = AttendanceStatusData.fromJson(todayAttendance);
+
+          print('[DEBUG] AttendanceStatusData parsed:');
+          print('[DEBUG]   isCompleted: ${status.isCompleted}');
+          print('[DEBUG]   checkedIn: ${status.checkedIn}');
+          print('[DEBUG]   checkedOut: ${status.checkedOut}');
+          print('[DEBUG]   checkInTime: ${status.checkInTime}');
+          print('[DEBUG]   checkOutTime: ${status.checkOutTime}');
+
+          if (status.isCompleted &&
+              status.checkInTime != null &&
+              status.checkOutTime != null) {
+            print('[DEBUG] Showing: Attendance Completed');
+            setState(() => _attendanceCompleted = true);
+            NotificationDialogs.showAttendanceCompleted(
+              context,
+              checkInTime: status.checkInTime!,
+              checkOutTime: status.checkOutTime!,
+              onConfirm: () {
+                // Balik ke home setelah dismiss dialog
+                Navigator.pop(context);
+              },
+            );
+            return;
+          } else if (status.checkedIn &&
+              !status.checkedOut &&
+              status.checkInTime != null) {
+            print(
+              '[DEBUG] Showing: Check-in Already Recorded (Ready to Check-out)',
+            );
+            NotificationDialogs.showInfo(
+              context,
+              title: 'Check-in Sudah Dicatat',
+              message:
+                  'Anda sudah check-in pada ${_formatTime(status.checkInTime!)}.\n\nSilakan ambil foto untuk check-out.',
+              onConfirm: () {},
+            );
+            setState(() => _isCheckOut = true);
+            return;
+          }
+        } catch (parseError) {
+          print('[ERROR] AttendanceStatusData parsing error: $parseError');
+          print('[ERROR] todayAttendance data: $todayAttendance');
         }
+      } else {
+        print('[DEBUG] todayAttendance is null');
       }
 
+      print('[DEBUG] Showing: Check Face Registration (ready to check-in)');
       _checkFaceRegistration();
     } catch (e) {
       if (mounted) {
+        print('[ERROR] _checkAttendanceStatus error: $e');
         _checkFaceRegistration();
       }
     }
@@ -99,19 +125,27 @@ class _CheckInScreenState extends State<CheckInScreen> {
       if (!mounted) return;
 
       print('[DEBUG] userProfile: $userProfile');
+      print('[DEBUG] userProfile keys: ${userProfile?.keys.toList()}');
 
-      // Handle berbagai tipe value: true/false, 1/0, "1"/"0", atau null
+      // Cek apakah face_encoding ada dan tidak kosong
       bool faceRegistered = false;
       if (userProfile != null) {
-        final faceReg = userProfile['face_registered'];
-        final hasFace = userProfile['has_face'];
+        final hasFaceEncodingKey = userProfile.containsKey('face_encoding');
+        print('[DEBUG] has face_encoding key: $hasFaceEncodingKey');
 
-        print(
-          '[DEBUG] face_registered: $faceReg (type: ${faceReg.runtimeType})',
-        );
-        print('[DEBUG] has_face: $hasFace (type: ${hasFace.runtimeType})');
+        if (hasFaceEncodingKey) {
+          final faceEncoding = userProfile['face_encoding'];
+          print('[DEBUG] face_encoding value: $faceEncoding');
+          print('[DEBUG] face_encoding type: ${faceEncoding.runtimeType}');
+          print('[DEBUG] face_encoding is list: ${faceEncoding is List}');
 
-        faceRegistered = _isTruthy(faceReg) || _isTruthy(hasFace);
+          if (faceEncoding is List) {
+            faceRegistered = faceEncoding.isNotEmpty;
+            print('[DEBUG] face_encoding length: ${faceEncoding.length}');
+          } else if (faceEncoding == null) {
+            print('[DEBUG] face_encoding is null - user belum register face');
+          }
+        }
       }
 
       print('[DEBUG] faceRegistered: $faceRegistered');
@@ -119,7 +153,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
       if (!faceRegistered) {
         NotificationDialogs.showFaceNotRegistered(
           context,
-          onGoToRegister: () {},
+          onGoToRegister: () {
+            // Navigate ke face register screen
+            Navigator.pushNamed(context, '/face-register');
+          },
         );
       } else {
         NotificationDialogs.showInfo(
@@ -146,22 +183,11 @@ class _CheckInScreenState extends State<CheckInScreen> {
   }
 
   String _formatTime(DateTime dateTime) {
-    final hours = dateTime.hour.toString().padLeft(2, '0');
-    final minutes = dateTime.minute.toString().padLeft(2, '0');
+    // Convert UTC to local timezone
+    final local = dateTime.toLocal();
+    final hours = local.hour.toString().padLeft(2, '0');
+    final minutes = local.minute.toString().padLeft(2, '0');
     return '$hours:$minutes';
-  }
-
-  /// Helper untuk cek apakah value dianggap "truthy"
-  /// Handle: true/false, 1/0, "1"/"0", "true"/"false"
-  bool _isTruthy(dynamic value) {
-    if (value == null) return false;
-    if (value is bool) return value;
-    if (value is int) return value != 0;
-    if (value is String) {
-      final lower = value.toLowerCase();
-      return lower == 'true' || lower == '1' || lower == 'yes';
-    }
-    return false;
   }
 
   @override
@@ -200,7 +226,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
         if (errorType == 'face_not_registered') {
           NotificationDialogs.showFaceNotRegistered(
             context,
-            onGoToRegister: () {},
+            onGoToRegister: () {
+              // Navigate ke face register screen
+              Navigator.pushNamed(context, '/face-register');
+            },
           );
         } else if (errorType == 'schedule_invalid') {
           // Message dari backend sudah cukup lengkap
@@ -361,26 +390,61 @@ class _CheckInScreenState extends State<CheckInScreen> {
               ],
             ),
             const Spacer(),
-            ElevatedButton(
-              onPressed: () => _capture(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: buttonColor,
-                shape: RoundedRectangleBorder(
+            if (_attendanceCompleted)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade100,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.green, width: 2),
                 ),
-              ),
-              child: _submitting
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Absensi Sudah Lengkap',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.bold,
                       ),
-                    )
-                  : Text(buttonText),
-            ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Check-in dan check-out sudah dicatat hari ini.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.green.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              )
+            else
+              ElevatedButton(
+                onPressed: () => _capture(context),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: buttonColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _submitting
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(buttonText),
+              ),
           ],
         ),
       ),

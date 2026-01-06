@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'screens/checkin_screen.dart';
+import 'screens/face_register_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_shell.dart';
 import 'screens/register_screen.dart';
@@ -78,6 +79,7 @@ class MyApp extends StatelessWidget {
         '/main': (_) => const MainShell(),
         '/checkin': (_) => const CheckInScreen(),
         '/register': (_) => const RegisterScreen(),
+        '/face-register': (_) => const FaceRegisterScreen(),
       },
     );
   }

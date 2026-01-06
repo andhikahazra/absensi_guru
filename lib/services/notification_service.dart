@@ -68,10 +68,11 @@ class AttendanceStatusData {
 
 /// Utility untuk notification dialogs
 class NotificationDialogs {
-  /// Format waktu HH:mm dari DateTime
+  /// Format waktu HH:mm dari DateTime (convert UTC to local)
   static String _formatTime(DateTime dateTime) {
-    final hours = dateTime.hour.toString().padLeft(2, '0');
-    final minutes = dateTime.minute.toString().padLeft(2, '0');
+    final local = dateTime.toLocal();
+    final hours = local.hour.toString().padLeft(2, '0');
+    final minutes = local.minute.toString().padLeft(2, '0');
     return '$hours:$minutes';
   }
 

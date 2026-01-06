@@ -30,7 +30,11 @@ class _FaceRegisterScreenState extends State<FaceRegisterScreen> {
       (cam) => cam.lensDirection == CameraLensDirection.front,
       orElse: () => cameras.first,
     );
-    final controller = CameraController(front, ResolutionPreset.medium, enableAudio: false);
+    final controller = CameraController(
+      front,
+      ResolutionPreset.medium,
+      enableAudio: false,
+    );
     _controller = controller;
     await controller.initialize();
     if (!mounted) return;
@@ -50,14 +54,25 @@ class _FaceRegisterScreenState extends State<FaceRegisterScreen> {
     try {
       final shot = await controller.takePicture();
       final file = File(shot.path);
-      await ApiService.instance.registerFace(file: file);
+      final response = await ApiService.instance.registerFace(file: file);
+
+      print('[DEBUG] registerFace response: $response');
+
+      // Fetch fresh user profile dari backend untuk update currentUser
+      await ApiService.instance.fetchCurrentUser();
+      print('[DEBUG] User profile refreshed from backend');
+      print(
+        '[DEBUG] face_encoding after refresh: ${ApiService.instance.currentUser?['face_encoding'] != null ? "EXISTS" : "NULL"}',
+      );
+
       if (!mounted) return;
       _showSuccess();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal daftar wajah: $e')),
-      );
+      print('[ERROR] registerFace error: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal daftar wajah: $e')));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -105,14 +120,23 @@ class _FaceRegisterScreenState extends State<FaceRegisterScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Container(
                         color: Colors.black,
-                        child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        ),
                       );
                     }
-                    if (snapshot.hasError || _controller == null || !_controller!.value.isInitialized) {
+                    if (snapshot.hasError ||
+                        _controller == null ||
+                        !_controller!.value.isInitialized) {
                       return Container(
                         color: Colors.black,
                         child: Center(
-                          child: Text('Kamera tidak tersedia', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+                          child: Text(
+                            'Kamera tidak tersedia',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
                         ),
                       );
                     }
@@ -122,17 +146,29 @@ class _FaceRegisterScreenState extends State<FaceRegisterScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text('Pastikan wajah terlihat jelas dan cukup cahaya.', style: theme.textTheme.bodyMedium),
+            Text(
+              'Pastikan wajah terlihat jelas dan cukup cahaya.',
+              style: theme.textTheme.bodyMedium,
+            ),
             const Spacer(),
             ElevatedButton(
               onPressed: _submitting ? null : _captureAndRegister,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: accentPurple,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               child: _submitting
-                  ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Capture & Register Face'),
             ),
           ],
